@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:id="@+id/map"
+              android:name="com.google.android.gms.maps.SupportMapFragment"
+              tools:context=".ChooseLocationOnMapActivity"/>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="bottom"
+            android:background="#80303030"
+            android:padding="5dp"
+            android:id="@+id/llRadiusSetterAndSubmit"
+            android:visibility="gone"
+            tools:visibility="visible">
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:textColor="@color/colorLight"
+                    android:text="@string/tv_radius_text"/>
+
+            <SeekBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_weight="100"
+                    android:max="1000"
+                    android:id="@+id/sbSetRadius"/>
+        </LinearLayout>
+
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_gravity="end"
+                android:textAllCaps="false"
+                android:layout_weight="1"
+                android:text="@string/submit_location_data"
+                android:id="@+id/btnSubmitLocation"/>
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Location Notifier</string>
+    <string name="invitation_text">Enter your location notification details:</string>
+    <string name="label_choose_location">Choose location point and radius</string>
+    <string name="enter_location_btn_text">Choose Location</string>
+    <string name="label_enter_a_message">Enter a notification message to send:</string>
+    <string name="label_enter_a_phone">Enter a phone number:</string>
+    <string name="add_contact_btn_text">Add from contacts</string>
+    <string name="submit_btn_text">Submit</string>
+    <string name="title_activity_choose_location_on_map">Choose Location</string>
+    <string name="tv_on_map_coords">latitude: {0}, longitude: {1}\nradius: {2}</string>
+    <string name="tv_radius_text">Radius:</string>
+    <string name="submit_location_data">Submit Location</string>
+    <string name="tv_or_text">or</string>
+    <string name="dialog_title_choose_phone">Choose the phone number</string>
+    <string name="dialog_title_error">Error</string>
+    <string name="dialog_error_message">Please, fulfill all the necessary data</string>
+    <string name="dialog_title_confirm_data">Confirm submitted data</string>
+    <string name="dialog_confirmation_message">Latitude: {0}\nLongitude: {1}\nRadius: {2}\nContact number:
+        {3}\nMessage: {4}
+    </string>
+    <string name="default_message">Generated on latitude: {0} longitude: {1} at {2}</string>
+    <string name="dialog_coming_soon">This feature is still being developed.</string>
+</resources>
