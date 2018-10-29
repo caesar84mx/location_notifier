@@ -67,13 +67,8 @@ class MainActivity : Activity(), View.OnClickListener {
         }
 
         when (requestCode) {
-            REQUEST_CODE_LOCATION_POINT -> {
-                processLocationPointRequestResult(data)
-            }
-
-            REQUEST_CODE_PHONE_NUM -> {
-                processPhoneImportRequestResult(data)
-            }
+            REQUEST_CODE_LOCATION_POINT -> processLocationPointRequestResult(data)
+            REQUEST_CODE_PHONE_NUM -> processPhoneImportRequestResult(data)
         }
 
         Log.d(APP_TAG, "Done.")
@@ -84,11 +79,8 @@ class MainActivity : Activity(), View.OnClickListener {
 
         when (v?.id) {
             btnChooseLocation.id -> handleChooseLocationButtonClick()
-
             btnAddContact.id -> handleAddContactButtonClick()
-
             btnSubmit.id -> handleSubmitButtonClick()
-
             sTaskSwitch.id -> handleTaskSwitchClick()
         }
     }
@@ -124,6 +116,8 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun restoreState(savedInstanceState: Bundle) {
+        Log.d(APP_TAG, "Restoring state")
+
         location = savedInstanceState.getParcelable(LOCATION_KEY)
         radius = savedInstanceState.getDouble(RADIUS_KEY)
         phoneNum = savedInstanceState.getString(PHONE_NUM_KEY)
@@ -145,9 +139,13 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun handleTaskSwitchClick() {
+        Log.d(APP_TAG, "Handling task run switch...")
+
         var intent: Intent? = null
 
         if (sTaskSwitch.isChecked) {
+            Log.d(APP_TAG, "Starting task...")
+
             Utility.checkPermission(Manifest.permission.SEND_SMS, MY_PERMISSION_REQUEST_CODE_SEND_SMS, this)
 
             intent = Intent(this, LocationTrackingService::class.java)
@@ -158,6 +156,7 @@ class MainActivity : Activity(), View.OnClickListener {
 
             startService(intent)
         } else {
+            Log.d(APP_TAG, "Stopping the task...")
             if (intent != null) {
                 stopService(intent)
             }
@@ -165,9 +164,13 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun handleSubmitButtonClick() {
+        Log.d(APP_TAG, "Handling submit button...")
+
         message = edShortMessage.text.toString()
 
         if (location == null || radius == null || phoneNum == null) {
+            Log.d(APP_TAG, "Not all fields are fulfilled!")
+
             AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_title_error)
                 .setMessage(R.string.dialog_error_message)
@@ -177,6 +180,8 @@ class MainActivity : Activity(), View.OnClickListener {
                 .create()
                 .show()
         } else {
+            Log.d(APP_TAG, "Confirmation alert...")
+
             AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_title_confirm_data)
                 .setMessage(
@@ -202,12 +207,16 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun handleAddContactButtonClick() {
+        Log.d(APP_TAG, "Handling add from contact button...")
+
         Utility.checkPermission(Manifest.permission.READ_CONTACTS, MY_PERMISSION_REQUEST_CODE_READ_CONTACTS, this)
         val intent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
         startActivityForResult(intent, REQUEST_CODE_PHONE_NUM)
     }
 
     private fun handleChooseLocationButtonClick() {
+        Log.d(APP_TAG, "Handling choose location button")
+
         val newIntent = Intent(applicationContext, ChooseLocationOnMapActivity::class.java)
         startActivityForResult(newIntent, REQUEST_CODE_LOCATION_POINT)
     }
