@@ -84,7 +84,10 @@ class Utility private constructor() {
         }
 
         fun networkProviderAvailable(locationManager: LocationManager?): Boolean {
-            return locationManager!!.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+            Log.d(APP_TAG, "Checking network provider availability")
+            val result = locationManager!!.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+            Log.d(APP_TAG, if (result) "Enabled" else "Disabled")
+            return result
         }
 
         private fun formatPhoneNumber(phoneNumber: String?): String {

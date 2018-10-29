@@ -47,11 +47,15 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
+        Log.d(APP_TAG, "Saving state...")
+
         outState?.putParcelable(LOCATION_KEY, location)
         outState?.putDouble(RADIUS_KEY, if (radius == null) 0.0 else radius!!)
         outState?.putString(PHONE_NUM_KEY, phoneNum)
         outState?.putString(MESSAGE_KEY, message)
         outState?.putInt(SWITCH_VISIBILITY_KEY, sTaskSwitch.visibility)
+
+        Log.d(APP_TAG, "Saved.")
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -90,7 +94,7 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun processPhoneImportRequestResult(data: Intent) {
-        Log.d(APP_TAG, "Retrieving contact data.")
+        Log.d(APP_TAG, "Retrieving contact data...")
 
         val phones = Utility.retrievePhoneNumbersFromUri(data.data, this)
         val builder = AlertDialog.Builder(this)
@@ -105,7 +109,7 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun processLocationPointRequestResult(data: Intent) {
-        Log.d(APP_TAG, "Retrieving location data.")
+        Log.d(APP_TAG, "Retrieving location data...")
 
         location = data.getParcelableExtra(LOCATION_KEY)
         radius = data.getDoubleExtra(RADIUS_KEY, 0.0)
@@ -141,6 +145,8 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun handleTaskSwitchClick() {
+        var intent: Intent? = null
+
         if (sTaskSwitch.isChecked) {
             Utility.checkPermission(Manifest.permission.SEND_SMS, MY_PERMISSION_REQUEST_CODE_SEND_SMS, this)
 
@@ -151,6 +157,10 @@ class MainActivity : Activity(), View.OnClickListener {
                 .putExtra(Utility.TARGET_NOTIFICATION_MESSAGE_KEY, message)
 
             startService(intent)
+        } else {
+            if (intent != null) {
+                stopService(intent)
+            }
         }
     }
 

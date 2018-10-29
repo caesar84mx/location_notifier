@@ -8,8 +8,10 @@ import android.graphics.Color
 import android.location.LocationManager
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
+import android.util.Log
 import android.view.View
 import android.widget.SeekBar
+import com.caesar84mx.locationnotifier.Utility.Companion.APP_TAG
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -41,6 +43,8 @@ class ChooseLocationOnMapActivity : FragmentActivity(), OnMapReadyCallback, Goog
     }
 
     override fun onMapReady(googleMap: GoogleMap?) {
+        Log.d(APP_TAG, "Map ready")
+
         mMap = googleMap
 
         Utility.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION, this)
