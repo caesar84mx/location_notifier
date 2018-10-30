@@ -45,6 +45,17 @@ class MainActivity : Activity(), View.OnClickListener {
 
         setContentView(R.layout.activity_main)
 
+        Utility.checkPermission(
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION,
+            this
+        )
+        Utility.checkPermission(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION,
+            this
+        )
+
         btnChooseLocation.setOnClickListener(this)
         btnAddContact.setOnClickListener(this)
         btnSubmit.setOnClickListener(this)

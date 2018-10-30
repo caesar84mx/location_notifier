@@ -11,6 +11,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.location.LocationManager.GPS_PROVIDER
+import android.location.LocationManager.NETWORK_PROVIDER
 import android.os.Binder
 import android.os.Build
 import android.os.Bundle
@@ -20,12 +21,14 @@ import android.support.v4.app.NotificationCompat
 import android.telephony.SmsManager
 import android.util.Log
 import com.caesar84mx.locationnotifier.Utility.Companion.APP_TAG
+import com.caesar84mx.locationnotifier.Utility.Companion.networkProviderAvailable
 import com.google.android.gms.maps.model.LatLng
 import java.util.*
 
 private const val SPEAKER_ID = "loc_notifier_service_speaker"
 
 class LocationTrackingService : Service(), LocationListener {
+    private var latLong: LatLng? = null
     private var targetLocation: Location? = null
     private var triggerLocation: Location? = null
     private var radius: Double = 100.0
@@ -36,22 +39,22 @@ class LocationTrackingService : Service(), LocationListener {
 
     private var speaker: TextToSpeech? = null
 
-    private var isDone: Boolean = false
+    var isDone: Boolean = false
 
     private val binder = LocationServiceTrackerBinder()
 
     override fun onCreate() {
         super.onCreate()
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        speaker = TextToSpeech(applicationContext) {
-            speaker?.language = Locale.US
-            speaker?.setPitch(2.7f)
-        }
     }
 
     @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(APP_TAG, "Starting service...")
+
+        speaker = TextToSpeech(applicationContext) {
+            speaker?.language = Locale.US
+        }
 
         speaker?.speak(getString(R.string.speaker_text_starting_service), TextToSpeech.QUEUE_FLUSH, null, SPEAKER_ID)
         retrieveDataFromIntent(intent)
@@ -65,13 +68,10 @@ class LocationTrackingService : Service(), LocationListener {
         locationManager?.requestLocationUpdates(provider, 1000, 5f, this)
         notifySender("Location Notifier", "Target location: ${targetLocation?.longitude}, ${targetLocation?.latitude}")
 
-        return Service.START_REDELIVER_INTENT
+        return START_STICKY
     }
 
-    override fun onBind(intent: Intent): IBinder {
-        Log.d(APP_TAG, "Binding... Intent: $intent")
-        return binder
-    }
+    override fun onBind(intent: Intent): IBinder = binder
 
     override fun onLocationChanged(location: Location?) {
         verifyProximity(location)
@@ -176,11 +176,15 @@ class LocationTrackingService : Service(), LocationListener {
     private fun retrieveDataFromIntent(intent: Intent?) {
         Log.d(APP_TAG, "Retrieving data from intent...")
 
-        val latLong: LatLng? = intent!!.getParcelableExtra(Utility.TARGET_LOCATION_KEY)
+        latLong = intent!!.getParcelableExtra(Utility.TARGET_LOCATION_KEY)
 
-        targetLocation = Location(GPS_PROVIDER)
+        targetLocation = if (networkProviderAvailable(locationManager)) {
+            Location(NETWORK_PROVIDER)
+        } else {
+            Location(GPS_PROVIDER)
+        }
         targetLocation?.longitude = latLong!!.longitude
-        targetLocation?.latitude = latLong.latitude
+        targetLocation?.latitude = latLong!!.latitude
 
         radius = intent.getDoubleExtra(Utility.TARGET_RADIUS_KEY, 100.0)
         phoneNumber = intent.getStringExtra(Utility.TARGET_PHONE_NUMBER_KEY)
@@ -191,13 +195,35 @@ class LocationTrackingService : Service(), LocationListener {
 
     override fun onDestroy() {
         Log.d(APP_TAG, "Destroying service...")
-        notifySender(
-            getString(R.string.notification_location_notifier_title_text),
-            getString(R.string.notification_service_stopped_text)
-        )
-        speaker?.speak(getString(R.string.speaker_text_exiting), TextToSpeech.QUEUE_FLUSH, null, SPEAKER_ID)
+
+        if (isDone) {
+            Log.d(APP_TAG, "Task completed")
+            notifySender(
+                getString(R.string.notification_location_notifier_title_text),
+                getString(R.string.notification_service_stopped_text)
+            )
+            speaker?.speak(getString(R.string.speaker_text_exiting), TextToSpeech.QUEUE_FLUSH, null, SPEAKER_ID)
+
+            if (speaker != null) {
+                speaker?.stop()
+                speaker?.shutdown()
+            } else {
+                Log.d(APP_TAG, "Task not completed, restarting")
+
+                val broadcastIntent = Intent("com.caesar84mx.RestartNotifier")
+                broadcastIntent
+                    .putExtra(Utility.TARGET_LOCATION_KEY, targetLocation)
+                    .putExtra(Utility.TARGET_RADIUS_KEY, radius)
+                    .putExtra(Utility.TARGET_PHONE_NUMBER_KEY, phoneNumber)
+                    .putExtra(Utility.TARGET_NOTIFICATION_MESSAGE_KEY, notificationMessage)
+                sendBroadcast(broadcastIntent)
+            }
+        }
+
         super.onDestroy()
     }
+
+    private
 
     inner class LocationServiceTrackerBinder : Binder() {
         internal val service: LocationTrackingService

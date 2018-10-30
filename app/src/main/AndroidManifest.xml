@@ -54,9 +54,17 @@
 
         <service
                 android:name=".LocationTrackingService"
+                android:enabled="true"/>
+
+        <receiver
+                android:name=".ServiceRestarterBroadcastReceiver"
                 android:enabled="true"
-                android:exported="false">
-        </service>
+                android:exported="true"
+                android:label="Restart tracking service when stopped prematurily">
+            <intent-filter>
+                <action android:name="com.caesar84mx.RestartNotifier"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -1,6 +1,6 @@
 package com.caesar84mx.locationnotifier
 
-import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -43,21 +43,11 @@ class ChooseLocationOnMapActivity : FragmentActivity(), OnMapReadyCallback, Goog
         (supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment).getMapAsync(this)
     }
 
+    @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap?) {
         Log.d(APP_TAG, "Map ready")
 
         mMap = googleMap
-
-        Utility.checkPermission(
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION,
-            this
-        )
-        Utility.checkPermission(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION,
-            this
-        )
 
         val latitude = if (Utility.networkProviderAvailable(locationManager)) {
             locationManager?.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)?.latitude

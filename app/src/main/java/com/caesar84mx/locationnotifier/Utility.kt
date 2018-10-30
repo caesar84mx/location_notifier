@@ -15,6 +15,7 @@ class Utility private constructor() {
         const val TARGET_RADIUS_KEY = "target_radius"
         const val TARGET_PHONE_NUMBER_KEY = "target_phone_number"
         const val TARGET_NOTIFICATION_MESSAGE_KEY = "target_notification_message"
+
         const val APP_TAG = "loc_notifier"
 
         @JvmStatic
