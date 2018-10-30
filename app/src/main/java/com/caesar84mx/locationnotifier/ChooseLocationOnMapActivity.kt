@@ -22,7 +22,8 @@ import kotlinx.android.synthetic.main.activity_choose_location_on_map.*
 const val MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
 const val MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 2
 
-class ChooseLocationOnMapActivity : FragmentActivity(), OnMapReadyCallback, GoogleMap.OnMapClickListener, SeekBar.OnSeekBarChangeListener, View.OnClickListener {
+class ChooseLocationOnMapActivity : FragmentActivity(), OnMapReadyCallback, GoogleMap.OnMapClickListener,
+    SeekBar.OnSeekBarChangeListener, View.OnClickListener {
     private var mMap: GoogleMap? = null
     private var locationManager: LocationManager? = null
 
@@ -47,31 +48,37 @@ class ChooseLocationOnMapActivity : FragmentActivity(), OnMapReadyCallback, Goog
 
         mMap = googleMap
 
-        Utility.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION, this)
-        Utility.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION, this)
+        Utility.checkPermission(
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION,
+            this
+        )
+        Utility.checkPermission(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION,
+            this
+        )
 
         val latitude = if (Utility.networkProviderAvailable(locationManager)) {
-            locationManager!!.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).latitude
+            locationManager?.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)?.latitude
         } else {
-            locationManager!!.getLastKnownLocation(LocationManager.GPS_PROVIDER).latitude
+            locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)?.latitude
         }
 
         val longitude = if (Utility.networkProviderAvailable(locationManager)) {
-            locationManager!!.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).longitude
+            locationManager?.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)?.longitude
         } else {
-            locationManager!!.getLastKnownLocation(LocationManager.GPS_PROVIDER).longitude
+            locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)?.longitude
         }
 
-        val position = LatLng(latitude, longitude)
-
-        mMap?.addCircle(
-            CircleOptions()
-                .center(position)
-                .radius(2.0)
-                .strokeColor(Color.BLUE)
-                .fillColor(Color.BLUE))
-
+        val position = LatLng(latitude!!, longitude!!)
         mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 16.0f))
+
+        mMap?.isMyLocationEnabled = true
+        mMap?.uiSettings?.isMyLocationButtonEnabled = true
+        mMap?.uiSettings?.isRotateGesturesEnabled = true
+        mMap?.uiSettings?.isZoomControlsEnabled = true
+        mMap?.uiSettings?.isMapToolbarEnabled = true
 
         mMap?.setOnMapClickListener(this)
     }

@@ -15,11 +15,15 @@ import android.os.Binder
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.speech.tts.TextToSpeech
 import android.support.v4.app.NotificationCompat
 import android.telephony.SmsManager
 import android.util.Log
 import com.caesar84mx.locationnotifier.Utility.Companion.APP_TAG
 import com.google.android.gms.maps.model.LatLng
+import java.util.*
+
+private const val SPEAKER_ID = "loc_notifier_service_speaker"
 
 class LocationTrackingService : Service(), LocationListener {
     private var targetLocation: Location? = null
@@ -30,6 +34,8 @@ class LocationTrackingService : Service(), LocationListener {
     private var locationManager: LocationManager? = null
     private var distance: Float? = null
 
+    private var speaker: TextToSpeech? = null
+
     private var isDone: Boolean = false
 
     private val binder = LocationServiceTrackerBinder()
@@ -37,12 +43,17 @@ class LocationTrackingService : Service(), LocationListener {
     override fun onCreate() {
         super.onCreate()
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        speaker = TextToSpeech(applicationContext) {
+            speaker?.language = Locale.US
+            speaker?.setPitch(2.7f)
+        }
     }
 
     @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(APP_TAG, "Starting service...")
 
+        speaker?.speak(getString(R.string.speaker_text_starting_service), TextToSpeech.QUEUE_FLUSH, null, SPEAKER_ID)
         retrieveDataFromIntent(intent)
 
         val provider = if (Utility.networkProviderAvailable(locationManager)) {
@@ -103,11 +114,29 @@ class LocationTrackingService : Service(), LocationListener {
     private fun notifySender(title: String, message: String) {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val mBuilder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val mBuilder = getNotificationBuilder(notificationManager)
+
+        mBuilder
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .setContentTitle(title)
+            .setContentText(getString(R.string.notification_content_text))
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(message)
+            )
+            .setAutoCancel(true)
+
+        with(notificationManager) {
+            notify(1, mBuilder.build())
+        }
+    }
+
+    private fun getNotificationBuilder(notificationManager: NotificationManager): NotificationCompat.Builder {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelId = "3000"
-            val name = "Channel Name"
-            val description = "Chanel Description"
-            val importance = NotificationManager.IMPORTANCE_LOW
+            val name = "loc_notifier"
+            val description = "Chanel to transmit location notifier messages"
+            val importance = NotificationManager.IMPORTANCE_HIGH
             val mChannel = NotificationChannel(channelId, name, importance)
             mChannel.description = description
             mChannel.enableLights(true)
@@ -116,19 +145,7 @@ class LocationTrackingService : Service(), LocationListener {
             NotificationCompat.Builder(this, channelId)
         } else {
             NotificationCompat.Builder(this)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-        }
-
-        mBuilder
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle(title)
-            .setContentText(getString(R.string.notification_content_text))
-            .setStyle(NotificationCompat.BigTextStyle()
-                .bigText(message))
-            .setAutoCancel(true)
-
-        with(notificationManager) {
-            notify(1, mBuilder.build())
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
         }
     }
 
@@ -151,6 +168,7 @@ class LocationTrackingService : Service(), LocationListener {
             null,
             null
         )
+        speaker?.speak(getString(R.string.speaker_text_message_sent), TextToSpeech.QUEUE_FLUSH, null, SPEAKER_ID)
 
         Log.d(APP_TAG, "Sent.")
     }
@@ -166,18 +184,18 @@ class LocationTrackingService : Service(), LocationListener {
 
         radius = intent.getDoubleExtra(Utility.TARGET_RADIUS_KEY, 100.0)
         phoneNumber = intent.getStringExtra(Utility.TARGET_PHONE_NUMBER_KEY)
-        notificationMessage = intent.getStringExtra(Utility.TARGET_NOTIFICATION_MESSAGE_KEY)
-
-        if (notificationMessage == null) {
-            notificationMessage = ""
-        }
+        notificationMessage = intent.getStringExtra(Utility.TARGET_NOTIFICATION_MESSAGE_KEY) ?: ""
 
         Log.d(APP_TAG, "Retrieved.")
     }
 
     override fun onDestroy() {
         Log.d(APP_TAG, "Destroying service...")
-        notifySender("Location Notifier", "Service stopped")
+        notifySender(
+            getString(R.string.notification_location_notifier_title_text),
+            getString(R.string.notification_service_stopped_text)
+        )
+        speaker?.speak(getString(R.string.speaker_text_exiting), TextToSpeech.QUEUE_FLUSH, null, SPEAKER_ID)
         super.onDestroy()
     }
 

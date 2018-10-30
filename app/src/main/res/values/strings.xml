@@ -24,4 +24,12 @@
     <string name="btn_start_text">Start</string>
     <string name="btn_started_text">Started</string>
     <string name="notification_content_text">You have a new notification</string>
+    <string name="ok_alert_button_text">OK</string>
+    <string name="alert_negative_button_text">Cancel</string>
+    <string name="save_alert_button_text">Save</string>
+    <string name="notification_location_notifier_title_text">Location Notifier</string>
+    <string name="notification_service_stopped_text">Service stopped</string>
+    <string name="speaker_text_message_sent">The proximity message has been sent</string>
+    <string name="speaker_text_starting_service">Starting location tracking</string>
+    <string name="speaker_text_exiting">Quitting</string>
 </resources>

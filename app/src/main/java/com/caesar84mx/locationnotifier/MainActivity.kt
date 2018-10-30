@@ -171,7 +171,7 @@ class MainActivity : Activity(), View.OnClickListener {
             AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_title_error)
                 .setMessage(R.string.dialog_error_message)
-                .setPositiveButton("OK") { dialog, _ ->
+                .setPositiveButton(getString(R.string.ok_alert_button_text)) { dialog, _ ->
                     dialog.cancel()
                 }
                 .create()
@@ -191,10 +191,10 @@ class MainActivity : Activity(), View.OnClickListener {
                         message
                     )
                 )
-                .setNegativeButton("Cancel") { dialog, _ ->
+                .setNegativeButton(getString(R.string.alert_negative_button_text)) { dialog, _ ->
                     dialog.cancel()
                 }
-                .setPositiveButton("Submit") { dialog, _ ->
+                .setPositiveButton(getString(R.string.save_alert_button_text)) { dialog, _ ->
                     btnStartTask.visibility = View.VISIBLE
                     dialog.dismiss()
                 }
@@ -227,7 +227,6 @@ class MainActivity : Activity(), View.OnClickListener {
         btnStartTask.text = getString(R.string.btn_started_text)
 
         isMainScreenEnabled = false
-//        toggleViewsAvailability(llMainLayout, isMainScreenEnabled)
 
         val intent = Intent(this, LocationTrackingService::class.java)
             .putExtra(Utility.TARGET_LOCATION_KEY, location)
