@@ -6,7 +6,7 @@
     <string name="label_enter_a_message">Enter a notification message to send:</string>
     <string name="label_enter_a_phone">Enter a phone number:</string>
     <string name="add_contact_btn_text">Add from contacts</string>
-    <string name="submit_btn_text">Submit</string>
+    <string name="submit_btn_text">Save</string>
     <string name="title_activity_choose_location_on_map">Choose Location</string>
     <string name="tv_on_map_coords">latitude: {0}, longitude: {1}\nradius: {2}</string>
     <string name="tv_radius_text">Radius:</string>
@@ -21,4 +21,7 @@
     </string>
     <string name="default_message">Generated on latitude: {0} longitude: {1} at {2}</string>
     <string name="dialog_coming_soon">This feature is still being developed.</string>
+    <string name="btn_start_text">Start</string>
+    <string name="btn_started_text">Started</string>
+    <string name="notification_content_text">You have a new notification</string>
 </resources>

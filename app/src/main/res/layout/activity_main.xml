@@ -7,6 +7,7 @@
         android:baselineAligned="true"
         android:orientation="vertical"
         android:padding="5dp"
+        android:id="@+id/llMainLayout"
         tools:context=".MainActivity">
 
     <TextView
@@ -110,22 +111,24 @@
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="10dp"
             android:orientation="horizontal">
 
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="2"
                 android:id="@+id/tvCoordinates"
                 tools:text="Coordinates: @1323244, @324454323"/>
 
-        <Switch
-                android:layout_width="match_parent"
+        <Button
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/sTaskSwitch"
+                android:layout_weight="1"
+                android:layout_gravity="end"
                 android:visibility="gone"
-                android:gravity="end"
-                android:checked="false"
-                tools:visibility="visible"
-                tools:checked="true"/>
+                android:text="@string/btn_start_text"
+                android:id="@+id/btnStartTask"/>
     </LinearLayout>
 </LinearLayout>

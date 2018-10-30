@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.provider.ContactsContract
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import com.caesar84mx.locationnotifier.Utility.Companion.APP_TAG
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.android.synthetic.main.activity_main.*
@@ -25,11 +26,15 @@ private const val PHONE_NUM_KEY = "phone_num"
 private const val MESSAGE_KEY = "message"
 private const val SWITCH_VISIBILITY_KEY = "switch_visibility"
 
+private const val STARTED_STATE_KEY = "started_state"
+private const val MAIN_SCREEN_ENABLED_STATE_KEY = "main_screen_enabled_state"
+
 class MainActivity : Activity(), View.OnClickListener {
     private var location: LatLng? = null
     private var radius: Double? = null
     private var phoneNum: String? = null
     private var message: String? = null
+    private var isMainScreenEnabled: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,17 +48,19 @@ class MainActivity : Activity(), View.OnClickListener {
         btnChooseLocation.setOnClickListener(this)
         btnAddContact.setOnClickListener(this)
         btnSubmit.setOnClickListener(this)
-        sTaskSwitch.setOnClickListener(this)
+        btnStartTask.setOnClickListener(this)
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
         Log.d(APP_TAG, "Saving state...")
 
         outState?.putParcelable(LOCATION_KEY, location)
-        outState?.putDouble(RADIUS_KEY, if (radius == null) 0.0 else radius!!)
+        outState?.putDouble(RADIUS_KEY, if (radius == null) 100.0 else radius!!)
         outState?.putString(PHONE_NUM_KEY, phoneNum)
         outState?.putString(MESSAGE_KEY, message)
-        outState?.putInt(SWITCH_VISIBILITY_KEY, sTaskSwitch.visibility)
+        outState?.putInt(SWITCH_VISIBILITY_KEY, btnStartTask.visibility)
+        outState?.putBoolean(STARTED_STATE_KEY, btnStartTask.isEnabled)
+        outState?.putBoolean(MAIN_SCREEN_ENABLED_STATE_KEY, isMainScreenEnabled)
 
         Log.d(APP_TAG, "Saved.")
     }
@@ -75,13 +82,13 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     override fun onClick(v: View?) {
-        Log.d(APP_TAG, "${this.javaClass.simpleName } - Processing click...")
+        Log.d(APP_TAG, "${this.javaClass.simpleName} - Processing click...")
 
         when (v?.id) {
             btnChooseLocation.id -> handleChooseLocationButtonClick()
             btnAddContact.id -> handleAddContactButtonClick()
             btnSubmit.id -> handleSubmitButtonClick()
-            sTaskSwitch.id -> handleTaskSwitchClick()
+            btnStartTask.id -> handleStartTaskButtonClick()
         }
     }
 
@@ -122,7 +129,11 @@ class MainActivity : Activity(), View.OnClickListener {
         radius = savedInstanceState.getDouble(RADIUS_KEY)
         phoneNum = savedInstanceState.getString(PHONE_NUM_KEY)
         message = savedInstanceState.getString(MESSAGE_KEY)
+
+        isMainScreenEnabled = savedInstanceState.getBoolean(MAIN_SCREEN_ENABLED_STATE_KEY)
+
         val visibility = savedInstanceState.getInt(SWITCH_VISIBILITY_KEY)
+        val isStarted = savedInstanceState.getBoolean(STARTED_STATE_KEY)
 
         val text = MessageFormat.format(
             getString(R.string.tv_on_map_coords),
@@ -130,37 +141,23 @@ class MainActivity : Activity(), View.OnClickListener {
             location?.longitude,
             radius.toString()
         )
+
         tvCoordinates.text = text
 
         edPhoneNumber.setText(phoneNum)
         edShortMessage.setText(message)
-
-        sTaskSwitch.visibility = visibility
+        btnStartTask.visibility = visibility
+        toggleViewsAvailability(llMainLayout, isMainScreenEnabled)
+        btnStartTask.isEnabled = isStarted
     }
 
-    private fun handleTaskSwitchClick() {
-        Log.d(APP_TAG, "Handling task run switch...")
-
-        var intent: Intent? = null
-
-        if (sTaskSwitch.isChecked) {
-            Log.d(APP_TAG, "Starting task...")
-
-            Utility.checkPermission(Manifest.permission.SEND_SMS, MY_PERMISSION_REQUEST_CODE_SEND_SMS, this)
-
-            intent = Intent(this, LocationTrackingService::class.java)
-                .putExtra(Utility.TARGET_LOCATION_KEY, location)
-                .putExtra(Utility.TARGET_RADIUS_KEY, radius)
-                .putExtra(Utility.TARGET_PHONE_NUMBER_KEY, phoneNum)
-                .putExtra(Utility.TARGET_NOTIFICATION_MESSAGE_KEY, message)
-
-            startService(intent)
-        } else {
-            Log.d(APP_TAG, "Stopping the task...")
-            if (intent != null) {
-                stopService(intent)
+    private fun toggleViewsAvailability(parent: View, isEnabled: Boolean) {
+        if (parent is ViewGroup) {
+            for (i in 0 until parent.childCount) {
+                toggleViewsAvailability(parent.getChildAt(i), isEnabled)
             }
         }
+        parent.isEnabled = isEnabled
     }
 
     private fun handleSubmitButtonClick() {
@@ -198,7 +195,7 @@ class MainActivity : Activity(), View.OnClickListener {
                     dialog.cancel()
                 }
                 .setPositiveButton("Submit") { dialog, _ ->
-                    sTaskSwitch.visibility = View.VISIBLE
+                    btnStartTask.visibility = View.VISIBLE
                     dialog.dismiss()
                 }
                 .create()
@@ -219,5 +216,26 @@ class MainActivity : Activity(), View.OnClickListener {
 
         val newIntent = Intent(applicationContext, ChooseLocationOnMapActivity::class.java)
         startActivityForResult(newIntent, REQUEST_CODE_LOCATION_POINT)
+    }
+
+    private fun handleStartTaskButtonClick() {
+        Log.d(APP_TAG, "Handling task run switch...")
+
+        Utility.checkPermission(Manifest.permission.SEND_SMS, MY_PERMISSION_REQUEST_CODE_SEND_SMS, this)
+
+        btnStartTask.isEnabled = false
+        btnStartTask.text = getString(R.string.btn_started_text)
+
+        isMainScreenEnabled = false
+//        toggleViewsAvailability(llMainLayout, isMainScreenEnabled)
+
+        val intent = Intent(this, LocationTrackingService::class.java)
+            .putExtra(Utility.TARGET_LOCATION_KEY, location)
+            .putExtra(Utility.TARGET_RADIUS_KEY, radius)
+            .putExtra(Utility.TARGET_PHONE_NUMBER_KEY, phoneNum)
+            .putExtra(Utility.TARGET_NOTIFICATION_MESSAGE_KEY, message)
+
+        startService(intent)
+        finish()
     }
 }
