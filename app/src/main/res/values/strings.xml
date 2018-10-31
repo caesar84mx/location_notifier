@@ -32,4 +32,8 @@
     <string name="speaker_text_message_sent">The proximity message has been sent</string>
     <string name="speaker_text_starting_service">Starting location tracking</string>
     <string name="speaker_text_exiting">Quitting</string>
+    <string name="dialog_title_under_construction">This feature is still under construction</string>
+    <string name="dialog_not_ready_message">This feature is actually navailable in this Android version. We are working
+        on it
+    </string>
 </resources>

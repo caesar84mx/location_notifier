@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.view.View
@@ -244,7 +245,16 @@ class MainActivity : Activity(), View.OnClickListener {
             .putExtra(Utility.TARGET_PHONE_NUMBER_KEY, phoneNum)
             .putExtra(Utility.TARGET_NOTIFICATION_MESSAGE_KEY, message)
 
-        startService(intent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startService(intent)
+        } else {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.dialog_title_under_construction)
+                .setMessage(getString(R.string.dialog_not_ready_message))
+                .create()
+                .show()
+        }
+
         finish()
     }
 }
