@@ -6,10 +6,9 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import com.caesar84mx.locationnotifier.Utility.Companion.APP_TAG
+import com.caesar84mx.locationnotifier.Utility.Companion.log
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.android.synthetic.main.activity_main.*
 import java.text.MessageFormat
@@ -63,7 +62,7 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
-        Log.d(APP_TAG, "Saving state...")
+        log( "Saving state...")
 
         outState?.putParcelable(LOCATION_KEY, location)
         outState?.putDouble(RADIUS_KEY, if (radius == null) 100.0 else radius!!)
@@ -73,14 +72,14 @@ class MainActivity : Activity(), View.OnClickListener {
         outState?.putBoolean(STARTED_STATE_KEY, btnStartTask.isEnabled)
         outState?.putBoolean(MAIN_SCREEN_ENABLED_STATE_KEY, isMainScreenEnabled)
 
-        Log.d(APP_TAG, "Saved.")
+        log( "Saved.")
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.d(APP_TAG, "Retrieving results from other activity...")
+        log( "Retrieving results from other activity...")
 
         if (data == null) {
-            Log.d(APP_TAG, "No data received.")
+            log( "No data received.")
             return
         }
 
@@ -89,11 +88,11 @@ class MainActivity : Activity(), View.OnClickListener {
             REQUEST_CODE_PHONE_NUM -> processPhoneImportRequestResult(data)
         }
 
-        Log.d(APP_TAG, "Done.")
+        log( "Done.")
     }
 
     override fun onClick(v: View?) {
-        Log.d(APP_TAG, "${this.javaClass.simpleName} - Processing click...")
+        log( "${this.javaClass.simpleName} - Processing click...")
 
         when (v?.id) {
             btnChooseLocation.id -> handleChooseLocationButtonClick()
@@ -104,7 +103,7 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun processPhoneImportRequestResult(data: Intent) {
-        Log.d(APP_TAG, "Retrieving contact data...")
+        log( "Retrieving contact data...")
 
         val phones = Utility.retrievePhoneNumbersFromUri(data.data, this)
         val builder = AlertDialog.Builder(this)
@@ -119,7 +118,7 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun processLocationPointRequestResult(data: Intent) {
-        Log.d(APP_TAG, "Retrieving location data...")
+        log( "Retrieving location data...")
 
         location = data.getParcelableExtra(LOCATION_KEY)
         radius = data.getDoubleExtra(RADIUS_KEY, 0.0)
@@ -134,7 +133,7 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun restoreState(savedInstanceState: Bundle) {
-        Log.d(APP_TAG, "Restoring state")
+        log( "Restoring state")
 
         location = savedInstanceState.getParcelable(LOCATION_KEY)
         radius = savedInstanceState.getDouble(RADIUS_KEY)
@@ -172,12 +171,12 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun handleSubmitButtonClick() {
-        Log.d(APP_TAG, "Handling submit button...")
+        log( "Handling submit button...")
 
         message = edShortMessage.text.toString()
 
         if (location == null || radius == null || phoneNum == null) {
-            Log.d(APP_TAG, "Not all fields are fulfilled!")
+            log( "Not all fields are fulfilled!")
 
             AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_title_error)
@@ -188,7 +187,7 @@ class MainActivity : Activity(), View.OnClickListener {
                 .create()
                 .show()
         } else {
-            Log.d(APP_TAG, "Confirmation alert...")
+            log( "Confirmation alert...")
 
             AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_title_confirm_data)
@@ -215,7 +214,7 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun handleAddContactButtonClick() {
-        Log.d(APP_TAG, "Handling add from contact button...")
+        log( "Handling add from contact button...")
 
         Utility.checkPermission(Manifest.permission.READ_CONTACTS, MY_PERMISSION_REQUEST_CODE_READ_CONTACTS, this)
         val intent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
@@ -223,14 +222,14 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun handleChooseLocationButtonClick() {
-        Log.d(APP_TAG, "Handling choose location button")
+        log( "Handling choose location button")
 
         val newIntent = Intent(applicationContext, ChooseLocationOnMapActivity::class.java)
         startActivityForResult(newIntent, REQUEST_CODE_LOCATION_POINT)
     }
 
     private fun handleStartTaskButtonClick() {
-        Log.d(APP_TAG, "Handling task run switch...")
+        log( "Handling task run switch...")
 
         Utility.checkPermission(Manifest.permission.SEND_SMS, MY_PERMISSION_REQUEST_CODE_SEND_SMS, this)
 

@@ -5,11 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.caesar84mx.locationnotifier.Utility.Companion.APP_TAG
+import com.caesar84mx.locationnotifier.Utility.Companion.log
 import com.google.android.gms.maps.model.LatLng
 
 class ServiceRestarterBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        Log.d(APP_TAG, "Received request to restart service")
+        log( "Received request to restart service")
 
         var targetIntent = Intent(context, LocationTrackingService::class.java)
         targetIntent = this.copyExtras(intent, targetIntent)
@@ -18,7 +19,7 @@ class ServiceRestarterBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun copyExtras(from: Intent?, to: Intent?): Intent {
-        Log.d(APP_TAG, "Copying intent extras")
+        log( "Copying intent extras")
 
         val latLng = from!!.getParcelableExtra(Utility.TARGET_LOCATION_KEY) as LatLng
         val radius = from.getDoubleExtra(Utility.TARGET_RADIUS_KEY, 100.0)

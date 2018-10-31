@@ -8,10 +8,9 @@ import android.graphics.Color
 import android.location.LocationManager
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
-import android.util.Log
 import android.view.View
 import android.widget.SeekBar
-import com.caesar84mx.locationnotifier.Utility.Companion.APP_TAG
+import com.caesar84mx.locationnotifier.Utility.Companion.log
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -45,7 +44,7 @@ class ChooseLocationOnMapActivity : FragmentActivity(), OnMapReadyCallback, Goog
 
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap?) {
-        Log.d(APP_TAG, "Map ready")
+        log( "Map ready")
 
         mMap = googleMap
 
