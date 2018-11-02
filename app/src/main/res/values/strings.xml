@@ -36,4 +36,8 @@
     <string name="dialog_not_ready_message">This feature is actually navailable in this Android version. We are working
         on it
     </string>
+    <string name="location_service_permission">com.caesar84mx.LOCATION_TRACKING</string>
+    <string name="location_service_restart_permission">com.caesar84mx.LOCATION_TRACKING_RESTART</string>
+    <string name="notification_service_stopped_unterminated_text">Service stopped, but task has not been completed
+    </string>
 </resources>

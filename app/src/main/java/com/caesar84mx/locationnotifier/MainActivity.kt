@@ -63,7 +63,7 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
-        log( "Saving state...")
+        log("Saving state...")
 
         outState?.putParcelable(LOCATION_KEY, location)
         outState?.putDouble(RADIUS_KEY, if (radius == null) 100.0 else radius!!)
@@ -73,14 +73,14 @@ class MainActivity : Activity(), View.OnClickListener {
         outState?.putBoolean(STARTED_STATE_KEY, btnStartTask.isEnabled)
         outState?.putBoolean(MAIN_SCREEN_ENABLED_STATE_KEY, isMainScreenEnabled)
 
-        log( "Saved.")
+        log("Saved.")
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        log( "Retrieving results from other activity...")
+        log("Retrieving results from other activity...")
 
         if (data == null) {
-            log( "No data received.")
+            log("No data received.")
             return
         }
 
@@ -89,11 +89,11 @@ class MainActivity : Activity(), View.OnClickListener {
             REQUEST_CODE_PHONE_NUM -> processPhoneImportRequestResult(data)
         }
 
-        log( "Done.")
+        log("Done.")
     }
 
     override fun onClick(v: View?) {
-        log( "${this.javaClass.simpleName} - Processing click...")
+        log("${this.javaClass.simpleName} - Processing click...")
 
         when (v?.id) {
             btnChooseLocation.id -> handleChooseLocationButtonClick()
@@ -104,7 +104,7 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun processPhoneImportRequestResult(data: Intent) {
-        log( "Retrieving contact data...")
+        log("Retrieving contact data...")
 
         val phones = Utility.retrievePhoneNumbersFromUri(data.data, this)
         val builder = AlertDialog.Builder(this)
@@ -119,7 +119,7 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun processLocationPointRequestResult(data: Intent) {
-        log( "Retrieving location data...")
+        log("Retrieving location data...")
 
         location = data.getParcelableExtra(LOCATION_KEY)
         radius = data.getDoubleExtra(RADIUS_KEY, 0.0)
@@ -134,7 +134,7 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun restoreState(savedInstanceState: Bundle) {
-        log( "Restoring state")
+        log("Restoring state")
 
         location = savedInstanceState.getParcelable(LOCATION_KEY)
         radius = savedInstanceState.getDouble(RADIUS_KEY)
@@ -172,12 +172,12 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun handleSubmitButtonClick() {
-        log( "Handling submit button...")
+        log("Handling submit button...")
 
         message = edShortMessage.text.toString()
 
         if (location == null || radius == null || phoneNum == null) {
-            log( "Not all fields are fulfilled!")
+            log("Not all fields are fulfilled!")
 
             AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_title_error)
@@ -188,7 +188,7 @@ class MainActivity : Activity(), View.OnClickListener {
                 .create()
                 .show()
         } else {
-            log( "Confirmation alert...")
+            log("Confirmation alert...")
 
             AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_title_confirm_data)
@@ -215,7 +215,7 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun handleAddContactButtonClick() {
-        log( "Handling add from contact button...")
+        log("Handling add from contact button...")
 
         Utility.checkPermission(Manifest.permission.READ_CONTACTS, MY_PERMISSION_REQUEST_CODE_READ_CONTACTS, this)
         val intent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
@@ -223,14 +223,14 @@ class MainActivity : Activity(), View.OnClickListener {
     }
 
     private fun handleChooseLocationButtonClick() {
-        log( "Handling choose location button")
+        log("Handling choose location button")
 
         val newIntent = Intent(applicationContext, ChooseLocationOnMapActivity::class.java)
         startActivityForResult(newIntent, REQUEST_CODE_LOCATION_POINT)
     }
 
     private fun handleStartTaskButtonClick() {
-        log( "Handling task run switch...")
+        log("Handling task run switch...")
 
         Utility.checkPermission(Manifest.permission.SEND_SMS, MY_PERMISSION_REQUEST_CODE_SEND_SMS, this)
 
@@ -246,15 +246,19 @@ class MainActivity : Activity(), View.OnClickListener {
             .putExtra(Utility.TARGET_NOTIFICATION_MESSAGE_KEY, message)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startService(intent)
+            startForegroundService(intent)
         } else {
-            AlertDialog.Builder(this)
-                .setTitle(R.string.dialog_title_under_construction)
-                .setMessage(getString(R.string.dialog_not_ready_message))
-                .create()
-                .show()
+            startService(intent)
         }
 
         finish()
+    }
+
+    private fun makeStub() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.dialog_title_under_construction)
+            .setMessage(getString(R.string.dialog_not_ready_message))
+            .create()
+            .show()
     }
 }

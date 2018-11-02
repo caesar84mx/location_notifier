@@ -25,7 +25,7 @@ class LocationTracker(
     private var locationManager: LocationManager? = null
     private var distance: Float? = null
 
-    private var done: Boolean = true
+    private var done: Boolean = false
 
     fun isDone(): Boolean = done
 
@@ -47,7 +47,7 @@ class LocationTracker(
 
         val provider = Utility.getProvider(locationManager)
         locationManager?.requestLocationUpdates(provider, 1000, 5f, this)
-        Utility.notifyUser(context,"Location Notifier", "Tracking started. Target location: ${targetLocation?.longitude}, ${targetLocation?.latitude}")
+        Utility.notifyUser(context,"Location Notifier", "Tracking started.")
     }
 
     private fun verifyProximity(location: Location?) {
@@ -65,7 +65,7 @@ class LocationTracker(
             if (distance!! <= radius) {
                 triggerLocation = location
                 sendMessage()
-                done = true
+                stop()
             }
         } else {
             log("Service must be finished, but is still running...")
@@ -125,5 +125,11 @@ class LocationTracker(
 
     override fun onProviderDisabled(provider: String?) {
 
+    }
+
+    private fun stop() {
+        done = true
+        locationManager?.removeUpdates(this)
+        locationManager = null
     }
 }

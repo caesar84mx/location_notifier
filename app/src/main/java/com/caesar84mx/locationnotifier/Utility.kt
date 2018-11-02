@@ -11,8 +11,10 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
 import android.provider.ContactsContract
+import android.support.annotation.RequiresApi
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.NotificationCompat
+import android.util.Log
 
 class Utility private constructor() {
     companion object {
@@ -146,25 +148,36 @@ class Utility private constructor() {
             notificationManager: NotificationManager
         ): NotificationCompat.Builder {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channelId = "3000"
-                val name = "loc_notifier"
-                val description = "Chanel to transmit location notifier messages"
-                val importance = NotificationManager.IMPORTANCE_HIGH
-                val mChannel = NotificationChannel(channelId, name, importance)
-                mChannel.description = description
-                mChannel.enableLights(true)
-                mChannel.lightColor = Color.BLUE
-                notificationManager.createNotificationChannel(mChannel)
-                NotificationCompat.Builder(context, channelId)
+                val mChannel = getNotificationChannel()
+                notificationManager.createNotificationChannel(mChannel!!)
+                NotificationCompat.Builder(context, mChannel.id)
             } else {
                 NotificationCompat.Builder(context)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
             }
         }
-        
+
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun getNotificationChannel(): NotificationChannel? {
+            if (channel == null) {
+                val channelId = "3000"
+                val name = "loc_notifier"
+                val description = "Chanel to transmit location notifier messages"
+                val importance = NotificationManager.IMPORTANCE_HIGH
+                channel = NotificationChannel(channelId, name, importance)
+                channel?.description = description
+                channel?.enableLights(true)
+                channel?.lightColor = Color.BLUE
+            }
+
+            return channel
+        }
+
+        private var channel: NotificationChannel? = null
+
         @JvmStatic
         fun log(message: String) {
-            log( message)
+            Log.d(APP_TAG, message)
         }
 
         private fun formatPhoneNumber(phoneNumber: String?): String {
