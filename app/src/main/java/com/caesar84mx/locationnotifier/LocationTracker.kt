@@ -1,6 +1,7 @@
 package com.caesar84mx.locationnotifier
 
 import android.annotation.SuppressLint
+import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.location.Location
@@ -67,8 +68,6 @@ class LocationTracker(
                 sendMessage()
                 stop()
             }
-        } else {
-            log("Service must be finished, but is still running...")
         }
     }
 
@@ -131,5 +130,11 @@ class LocationTracker(
         done = true
         locationManager?.removeUpdates(this)
         locationManager = null
+
+        if (context is Service) {
+            context.stopSelf()
+        }
+
+        log("Tracking stopped")
     }
 }
