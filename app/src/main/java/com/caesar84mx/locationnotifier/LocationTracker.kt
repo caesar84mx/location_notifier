@@ -117,15 +117,15 @@ class LocationTracker(
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-
+        log("Status changed. Provider $provider, status $status")
     }
 
     override fun onProviderEnabled(provider: String?) {
-
+        log("Provider enabled, provider $provider")
     }
 
     override fun onProviderDisabled(provider: String?) {
-
+        log("Provider disabled, provider $provider")
     }
 
     private fun stop() {
