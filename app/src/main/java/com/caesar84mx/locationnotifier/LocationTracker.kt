@@ -1,6 +1,7 @@
 package com.caesar84mx.locationnotifier
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -8,6 +9,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.telephony.SmsManager
 import com.caesar84mx.locationnotifier.Utility.Companion.log
 import com.google.android.gms.maps.model.LatLng
@@ -127,14 +129,16 @@ class LocationTracker(
     }
 
     private fun stop() {
+        log("Stopping tracking...")
+
         done = true
         locationManager?.removeUpdates(this)
         locationManager = null
 
-        if (context is Service) {
-            context.stopSelf()
+        when (context) {
+            is Service -> context.stopSelf()
+            is Activity -> context.finish()
+            is AppCompatActivity -> context.finish()
         }
-
-        log("Tracking stopped")
     }
 }
